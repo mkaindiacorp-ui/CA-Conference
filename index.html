@@ -88,6 +88,14 @@
       animation: fadeUp 0.8s var(--transition) 0.2s forwards;
     }
 
+    .loader-logo {
+      width: 160px;
+      height: 160px;
+      object-fit: contain;
+      opacity: 0;
+      animation: fadeUp 0.8s var(--transition) 0.2s forwards;
+    }
+
     .loader-rule {
       width: 0;
       height: 1px;
@@ -98,8 +106,8 @@
 
     .loader-label {
       margin-top: 16px;
-      font-size: 9px;
-      letter-spacing: 0.4em;
+      font-size: 14px;
+      letter-spacing: 0.3em;
       text-transform: uppercase;
       color: var(--gold-dim);
       font-weight: 300;
@@ -854,8 +862,7 @@
 
   <!-- LOADER -->
   <div id="loader" aria-hidden="true">
-    <div class="loader-monogram"><imag src="CA logo.png"  width="200"
-    height="200"></div>
+    <img class="loader-logo" src="ca-logo-cropped.png" alt="ICAI Logo">
     <div class="loader-rule"></div>
     <div class="loader-label">The Institute of Chartered Accountants of India</div>
   </div>
@@ -892,18 +899,16 @@
 
         <div class="name-block">
           <h1 class="name-title" id="cName"></h1>
-          <div class="designation-row" id="designationRow" style="display:none;">
-            <span class="designation" id="cDesignation"></span>
+          <div class="designation-row">
+            <span class="designation" id="cDesignation">SRN No</span>
           </div>
-          <p class="company-name" id="cCollege" style="display:none;"></p>
         </div>
 
-        <p class="company-desc" id="taglineBlock" style="margin-top: 20px; display:none;"></p>
         <p class="company-desc" style="margin-top: 20px;">
-         SHRESTA 2026 – Inspiring Excellence, Shaping Tomorrow's Chartered Accountants.
+          SHRESTA 2026 – Inspiring Excellence, Shaping Tomorrow's Chartered Accountants.
         </p>
       </section>
-  
+
       <!-- ══ RIGHT PANEL ══ -->
       <section class="panel-right" aria-label="Contact and actions">
         <div class="right-glow" aria-hidden="true"></div>
@@ -949,17 +954,17 @@
             <i class="ti ti-arrow-right card-arrow" aria-hidden="true"></i>
           </a>
 
-          <a class="contact-card" id="card-instagram" href="#" target="_blank" rel="noopener"
-            style="--cd:0.76s; display:none;" aria-label="Instagram">
+          <a class="contact-card" id="card-instagram" href="https://instagram.com/mka.india.corp" target="_blank" rel="noopener"
+            style="--cd:0.76s" aria-label="Instagram @mka.india.corp">
             <div class="card-icon-wrap"><i class="ti ti-brand-instagram" aria-hidden="true"></i></div>
             <div class="card-text">
               <div class="card-label">Instagram</div>
-              <div class="card-sub" id="card-instagram-sub"></div>
+              <div class="card-sub">@mka.india.corp</div>
             </div>
             <i class="ti ti-arrow-right card-arrow" aria-hidden="true"></i>
           </a>
 
-          <a class="contact-card" id="card-linkedin" href="#" target="_blank" rel="noopener" style="--cd:0.84s; display:none;"
+          <a class="contact-card" href="https://linkedin.com" target="_blank" rel="noopener" style="--cd:0.84s"
             aria-label="LinkedIn">
             <div class="card-icon-wrap"><i class="ti ti-brand-linkedin" aria-hidden="true"></i></div>
             <div class="card-text">
@@ -978,22 +983,23 @@
           </button>
         </div>
 
-        <!-- Map: Event venue -->
+        <!-- Map -->
         <div class="map-panel">
-          <iframe src="https://maps.google.com/maps?q=CA+Bhawan+Nagpur&t=&z=15&ie=UTF8&iwloc=&output=embed"
-            loading="lazy" title="Event venue map" referrerpolicy="no-referrer-when-downgrade">
+          <iframe src="https://maps.google.com/maps?q=VANAMATI,+Gorepeth,+Nagpur&t=&z=15&ie=UTF8&iwloc=&output=embed"
+            loading="lazy" title="Office location map" referrerpolicy="no-referrer-when-downgrade">
           </iframe>
           <div class="map-overlay" onclick="openMap()" role="button" tabindex="0"
             aria-label="Open directions in Google Maps">
             <i class="ti ti-navigation" aria-hidden="true"></i>
-            Get Directions — CA Bhawan, Nagpur
+            Get Directions
           </div>
         </div>
 
         <!-- Footer watermark -->
         <div class="page-footer" aria-label="Company branding">
           <div class="footer-line" aria-hidden="true"></div>
-          <span class="footer-label" id="footerLabel">Powered by Madhu Kusum &amp; Associates</span>
+          <a class="footer-label" id="footerLabel" href="https://mkaindiacorp-ui.github.io/DigitalCards-Nilesh-Sakharkar/"
+            target="_blank" rel="noopener" style="text-decoration:none; color:inherit; cursor:pointer;">Madhu Kusum &amp; Associates</a>
         </div>
       </section>
 
@@ -1106,7 +1112,7 @@
 
     /* ── ACTIONS ── */
     function openMap() {
-      window.open('https://www.google.com/maps/dir//CA+Bhawan,+Nagpur');
+      window.open('https://www.google.com/maps/dir//VANAMATI,+626,+VIP+Rd,+Gorepeth,+Nagpur,+Maharashtra+440010');
     }
 
     function saveContact() {
@@ -1136,7 +1142,7 @@
        LOAD STUDENT DATA FROM PUBLISHED GOOGLE SHEET CSV
        ══════════════════════════════════════════════════════════ */
 
-    // ⚠️ REPLACE with your Sheet's "Publish to web" CSV URL (Part 2 of the guide)
+    // ⚠️ REPLACE with your Sheet's "Publish to web" CSV URL
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS3R_tiihiz-wlHR17p-2Jz9fzME5eb61P-Gh_jbPQA5-1ZJ0ZM2z8yao7hl286xXkwQP46__8Dlg8w/pub?gid=1305173024&single=true&output=csv";
 
     // Column headers exactly as they appear in your published sheet/tab
@@ -1145,9 +1151,8 @@
       name: "Full Name",
       phone: "Mobile No.",
       email: "Mail ID",
-      linkedin: "LinkedIn",
-      instagram: "Instagram User ID",
-      photoFileId: "Profile Photo" // see guide Part 3 for how this column is built
+      website: "Website",
+      photoFileId: "PhotoFileId"
     };
 
     function normalizePhone(v) {
@@ -1160,11 +1165,6 @@
       if (!v) return "";
       if (!/^https?:\/\//i.test(v)) return "https://" + v;
       return v;
-    }
-    function normalizeInstagram(v) {
-      if (!v) return "";
-      if (/^https?:\/\//i.test(v)) return v;
-      return "https://instagram.com/" + String(v).replace(/^@/, "");
     }
     function getInitials(name) {
       const parts = String(name).trim().split(/\s+/).filter(Boolean);
@@ -1179,7 +1179,7 @@
         '<div style="padding:60px 30px;text-align:center;">' +
         '<h2 style="font-weight:400;">Card ' + srNo + ' isn\'t registered yet</h2>' +
         '<p style="opacity:0.6;margin-top:10px;">Fill in your details once — this card will activate immediately.</p>' +
-        '<a href="https://forms.gle/AunFyBqVAPBmmiJLA" target="_blank" style="display:inline-block;margin-top:26px;background:#c9a84c;color:#080808;padding:13px 28px;border-radius:8px;text-decoration:none;font-weight:500;">Register This Card</a>' +
+        '<a href="YOUR_GOOGLE_FORM_LINK_HERE" target="_blank" style="display:inline-block;margin-top:26px;background:#c9a84c;color:#080808;padding:13px 28px;border-radius:8px;text-decoration:none;font-weight:500;">Register This Card</a>' +
         '</div>';
     }
 
@@ -1188,14 +1188,14 @@
       const phone = normalizePhone(row[COLS.phone]);
       const email = (row[COLS.email] || "").trim();
       const website = normalizeUrl(row[COLS.website] || "");
-      const instagram = normalizeInstagram(row[COLS.instagram]);
-      const linkedin = normalizeUrl(row[COLS.linkedin] || "");
       const photoFileId = (row[COLS.photoFileId] || "").trim();
+      const srNo = row[COLS.srNo] || "";
 
       window.studentData = { name, phone, email, website };
 
       document.getElementById('pageTitle').textContent = name + " — Digital Card";
       document.getElementById('cName').textContent = name;
+      document.getElementById('cDesignation').textContent = "SRN No " + srNo;
 
       if (photoFileId) {
         const img = document.getElementById('avatarPhoto');
@@ -1228,20 +1228,6 @@
         document.getElementById('card-website-sub').textContent = website.replace(/^https?:\/\//, "").replace(/\/$/, "");
         show(c);
       }
-      if (instagram) {
-        const c = document.getElementById('card-instagram');
-        c.href = instagram;
-        document.getElementById('card-instagram-sub').textContent = "@" + instagram.split("/").filter(Boolean).pop();
-        show(c);
-      }
-      if (linkedin) {
-        const c = document.getElementById('card-linkedin');
-        c.href = linkedin;
-        show(c);
-      }
-
-      document.getElementById('footerLabel').innerHTML =
-        "Card No. " + (row[COLS.srNo] || "") + " · Powered by Madhu Kusum &amp; Associates";
     }
 
     function initCard() {
