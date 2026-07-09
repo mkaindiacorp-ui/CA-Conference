@@ -1144,7 +1144,7 @@
       email: "Mail ID",
       linkedin: "LinkedIn",
       instagram: "Instagram User ID",
-      photoFileId: "PhotoFileId" // see guide Part 3 for how this column is built
+      photoFileId: "Profile Photo" // see guide Part 3 for how this column is built
     };
 
     function normalizePhone(v) {
@@ -1187,16 +1187,16 @@
       const website = normalizeUrl(row[COLS.website] || "");
       const instagram = normalizeInstagram(row[COLS.instagram]);
       const linkedin = normalizeUrl(row[COLS.linkedin] || "");
-      const photoFileId = (row[COLS.photoFileId] || "").trim();
+      const photoFileId = (row[COLS.Profile Photo] || "").trim();
 
       window.studentData = { name, phone, email, website };
 
       document.getElementById('pageTitle').textContent = name + " — Digital Card";
       document.getElementById('cName').textContent = name;
 
-      if (photoFileId) {
+      if (Profile Photo) {
         const img = document.getElementById('avatarPhoto');
-        img.src = "https://drive.google.com/thumbnail?id=" + photoFileId + "&sz=w500";
+        img.src = "https://drive.google.com/thumbnail?id=" + Profile Photo + "&sz=w500";
         img.style.display = "block";
         document.getElementById('avatarInitials').style.display = "none";
       } else {
