@@ -998,6 +998,7 @@
         <!-- Footer watermark -->
         <div class="page-footer" aria-label="Company branding">
           <div class="footer-line" aria-hidden="true"></div>
+          <span id="footerCardNo" style="display:block; font-size:11px; opacity:0.5; margin-bottom:4px;"></span>
           <a class="footer-label" id="footerLabel" href="https://mkaindiacorp-ui.github.io/DigitalCards-Nilesh-Sakharkar/"
             target="_blank" rel="noopener" style="text-decoration:none; color:inherit; cursor:pointer;">Madhu Kusum &amp; Associates</a>
         </div>
@@ -1148,6 +1149,7 @@
     // Column headers exactly as they appear in your published sheet/tab
     const COLS = {
       srNo: "Card Number",
+      srnNo: "SRN No",
       name: "Full Name",
       phone: "Mobile No.",
       email: "Mail ID",
@@ -1190,12 +1192,13 @@
       const website = normalizeUrl(row[COLS.website] || "");
       const photoFileId = (row[COLS.photoFileId] || "").trim();
       const srNo = row[COLS.srNo] || "";
+      const srnNo = row[COLS.srnNo] || "";
 
       window.studentData = { name, phone, email, website };
 
       document.getElementById('pageTitle').textContent = name + " — Digital Card";
       document.getElementById('cName').textContent = name;
-      document.getElementById('cDesignation').textContent = "SRN No " + srNo;
+      document.getElementById('cDesignation').textContent = srnNo ? ("SRN No " + srnNo) : "";
 
       if (photoFileId) {
         const img = document.getElementById('avatarPhoto');
@@ -1228,6 +1231,8 @@
         document.getElementById('card-website-sub').textContent = website.replace(/^https?:\/\//, "").replace(/\/$/, "");
         show(c);
       }
+
+      document.getElementById('footerCardNo').textContent = "Card No. " + srNo;
     }
 
     function initCard() {
