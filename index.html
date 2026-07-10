@@ -112,6 +112,8 @@
       color: var(--gold-dim);
       font-weight: 300;
       opacity: 0;
+      text-align: center;
+      max-width: 320px;
       animation: fadeUp 0.8s var(--transition) 1s forwards;
     }
 
@@ -748,6 +750,12 @@
      MOBILE LAYOUT
   ════════════════════════════════════ */
     @media (max-width: 768px) {
+      .loader-label {
+        max-width: 240px;
+        letter-spacing: 0.2em;
+        padding: 0 20px;
+      }
+
       .layout {
         display: flex;
         flex-direction: column;
@@ -1149,7 +1157,7 @@
     // Column headers exactly as they appear in your published sheet/tab
     const COLS = {
       srNo: "Card Number",
-      srnNo: "SRN No",
+      srnNo: "Student Registration Number",
       name: "Full Name",
       phone: "Mobile No.",
       email: "Mail ID",
@@ -1202,9 +1210,15 @@
 
       if (photoFileId) {
         const img = document.getElementById('avatarPhoto');
+        const initialsEl = document.getElementById('avatarInitials');
+        img.onerror = function () {
+          img.style.display = "none";
+          initialsEl.textContent = getInitials(name);
+          initialsEl.style.display = "";
+        };
         img.src = "https://drive.google.com/thumbnail?id=" + photoFileId + "&sz=w500";
         img.style.display = "block";
-        document.getElementById('avatarInitials').style.display = "none";
+        initialsEl.style.display = "none";
       } else {
         document.getElementById('avatarInitials').textContent = getInitials(name);
       }
