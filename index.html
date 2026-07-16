@@ -111,10 +111,19 @@
       text-transform: uppercase;
       color: var(--gold-dim);
       font-weight: 300;
-      opacity: 0;
       text-align: center;
-      max-width: 320px;
+      max-width: 280px;
+      padding: 0 20px;
+      opacity: 0;
       animation: fadeUp 0.8s var(--transition) 1s forwards;
+    }
+
+    @media (max-width: 480px) {
+      .loader-label {
+        font-size: 12px;
+        letter-spacing: 0.2em;
+        max-width: 240px;
+      }
     }
 
     @keyframes fadeUp {
@@ -750,12 +759,6 @@
      MOBILE LAYOUT
   ════════════════════════════════════ */
     @media (max-width: 768px) {
-      .loader-label {
-        max-width: 240px;
-        letter-spacing: 0.2em;
-        padding: 0 20px;
-      }
-
       .layout {
         display: flex;
         flex-direction: column;
@@ -972,7 +975,7 @@
             <i class="ti ti-arrow-right card-arrow" aria-hidden="true"></i>
           </a>
 
-          <a class="contact-card" href="https://linkedin.com" target="_blank" rel="noopener" style="--cd:0.84s"
+          <a class="contact-card" id="card-linkedin" href="#" target="_blank" rel="noopener" style="--cd:0.84s; display:none;"
             aria-label="LinkedIn">
             <div class="card-icon-wrap"><i class="ti ti-brand-linkedin" aria-hidden="true"></i></div>
             <div class="card-text">
@@ -1131,7 +1134,6 @@
       if (d.phone) lines.push('TEL;TYPE=CELL:' + d.phone);
       if (d.email) lines.push('EMAIL:' + d.email);
       if (d.website) lines.push('URL:' + d.website);
-      if (d.instagramHandle) lines.push('URL:https://instagram.com/' + d.instagramHandle);
       lines.push('END:VCARD');
       const vcard = lines.join('\n');
       const blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8' });
@@ -1153,7 +1155,7 @@
        ══════════════════════════════════════════════════════════ */
 
     // ⚠️ REPLACE with your Sheet's "Publish to web" CSV URL
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS3R_tiihiz-wlHR17p-2Jz9fzME5eb61P-Gh_jbPQA5-1ZJ0ZM2z8yao7hl286xXkwQP46__8Dlg8w/pub?gid=1469908399&single=true&output=csv";
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS3R_tiihiz-wlHR17p-2Jz9fzME5eb61P-Gh_jbPQA5-1ZJ0ZM2z8yao7hl286xXkwQP46__8Dlg8w/pub?gid=1305173024&single=true&output=csv";
 
     // Column headers exactly as they appear in your published sheet/tab
     const COLS = {
@@ -1164,29 +1166,9 @@
       email: "Mail ID",
       website: "Website",
       instagram: "Instagram User ID",
+      linkedin: "LinkedIn",
       photoFileId: "PhotoFileId"
     };
-
-    // Looks up a value by exact header first; if the header text doesn't
-    // match exactly (form question renamed, minor wording difference, etc.)
-    // falls back to any column whose header contains the given keyword —
-    // so this doesn't silently break like the Photo column did before.
-    function getField(row, exactHeader, containsFallback) {
-      if (row[exactHeader] !== undefined && row[exactHeader] !== "") return row[exactHeader];
-      if (containsFallback) {
-        const key = Object.keys(row).find(k => k.toLowerCase().includes(containsFallback));
-        if (key) return row[key];
-      }
-      return "";
-    }
-
-    function normalizeInstagramHandle(v) {
-      if (!v) return "";
-      const s = String(v).trim();
-      const urlMatch = s.match(/instagram\.com\/([A-Za-z0-9._]+)/i);
-      if (urlMatch) return urlMatch[1];
-      return s.replace(/^@/, "");
-    }
 
     function normalizePhone(v) {
       if (!v) return "";
@@ -1198,6 +1180,11 @@
       if (!v) return "";
       if (!/^https?:\/\//i.test(v)) return "https://" + v;
       return v;
+    }
+    function normalizeInstagram(v) {
+      if (!v) return "";
+      if (/^https?:\/\//i.test(v)) return v;
+      return "https://instagram.com/" + String(v).trim().replace(/^@/, "");
     }
     function getInitials(name) {
       const parts = String(name).trim().split(/\s+/).filter(Boolean);
@@ -1221,12 +1208,13 @@
       const phone = normalizePhone(row[COLS.phone]);
       const email = (row[COLS.email] || "").trim();
       const website = normalizeUrl(row[COLS.website] || "");
-      const instagramHandle = normalizeInstagramHandle(getField(row, COLS.instagram, "instagram"));
+      const instagram = normalizeInstagram(row[COLS.instagram] || "");
+      const linkedin = normalizeUrl(row[COLS.linkedin] || "");
       const photoFileId = (row[COLS.photoFileId] || "").trim();
       const srNo = row[COLS.srNo] || "";
       const srnNo = row[COLS.srnNo] || "";
 
-      window.studentData = { name, phone, email, website, instagramHandle };
+      window.studentData = { name, phone, email, website };
 
       document.getElementById('pageTitle').textContent = name + " — Digital Card";
       document.getElementById('cName').textContent = name;
@@ -1234,15 +1222,9 @@
 
       if (photoFileId) {
         const img = document.getElementById('avatarPhoto');
-        const initialsEl = document.getElementById('avatarInitials');
-        img.onerror = function () {
-          img.style.display = "none";
-          initialsEl.textContent = getInitials(name);
-          initialsEl.style.display = "";
-        };
         img.src = "https://drive.google.com/thumbnail?id=" + photoFileId + "&sz=w500";
         img.style.display = "block";
-        initialsEl.style.display = "none";
+        document.getElementById('avatarInitials').style.display = "none";
       } else {
         document.getElementById('avatarInitials').textContent = getInitials(name);
       }
@@ -1269,11 +1251,15 @@
         document.getElementById('card-website-sub').textContent = website.replace(/^https?:\/\//, "").replace(/\/$/, "");
         show(c);
       }
-      if (instagramHandle) {
+      if (instagram) {
         const c = document.getElementById('card-instagram');
-        c.href = "https://instagram.com/" + instagramHandle;
-        c.setAttribute('aria-label', 'Instagram @' + instagramHandle);
-        document.getElementById('card-instagram-sub').textContent = "@" + instagramHandle;
+        c.href = instagram;
+        document.getElementById('card-instagram-sub').textContent = "@" + instagram.split("/").filter(Boolean).pop();
+        show(c);
+      }
+      if (linkedin) {
+        const c = document.getElementById('card-linkedin');
+        c.href = linkedin;
         show(c);
       }
 
@@ -1294,7 +1280,26 @@
         .then(res => res.text())
         .then(csvText => {
           const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
-          const row = parsed.data.find(r => String(r[COLS.srNo] || "").trim() === srNo);
+          const matches = parsed.data.filter(r => String(r[COLS.srNo] || "").trim() === srNo);
+
+          let row = null;
+          if (matches.length === 1) {
+            row = matches[0];
+          } else if (matches.length > 1) {
+            // Multiple submissions for this card — use the most recent one.
+            // Prefer sorting by the Timestamp column if present; otherwise
+            // fall back to sheet row order (Forms appends chronologically,
+            // so the last match is the latest).
+            const withTime = matches.map(r => ({ r, t: Date.parse(r["Timestamp"]) }));
+            const allTimesValid = withTime.every(x => !isNaN(x.t));
+            if (allTimesValid) {
+              withTime.sort((a, b) => a.t - b.t);
+              row = withTime[withTime.length - 1].r;
+            } else {
+              row = matches[matches.length - 1];
+            }
+          }
+
           if (!row) {
             showNotRegistered(srNo);
           } else {
