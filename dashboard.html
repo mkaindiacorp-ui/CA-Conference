@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SHRESTA 2026 — Registration Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-dim: rgba(201,168,76,0.65);
+    --bg: #080808;
+    --panel: #121212;
+    --border: rgba(201,168,76,0.18);
+    --text: #f0ede6;
+    --text-dim: rgba(240,237,230,0.55);
+    --green: #4caf80;
+    --amber: #d9a441;
+    --red: #d9534f;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    padding: 32px 20px 60px;
+  }
+  h1 {
+    font-weight: 400;
+    font-size: 24px;
+    letter-spacing: 0.02em;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 13px;
+    margin-bottom: 32px;
+  }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    max-width: 1000px;
+    margin: 0 auto 36px;
+  }
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+  .stat-number {
+    font-size: 34px;
+    font-weight: 600;
+    color: var(--gold);
+    line-height: 1.1;
+  }
+  .stat-label {
+    margin-top: 6px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .stat-card.green .stat-number { color: var(--green); }
+  .stat-card.amber .stat-number { color: var(--amber); }
+  .stat-card.red .stat-number { color: var(--red); }
+
+  .bar-wrap {
+    max-width: 1000px;
+    margin: 0 auto 40px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .bar-row { margin-bottom: 14px; }
+  .bar-row:last-child { margin-bottom: 0; }
+  .bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .bar-track {
+    width: 100%;
+    height: 10px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.6s ease;
+  }
+
+  table {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    border-collapse: collapse;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 13px;
+  }
+  th, td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 11px;
+  }
+  tr:last-child td { border-bottom: none; }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+  }
+  .tag.missing { background: rgba(217,83,79,0.15); color: var(--red); }
+  .tag.ok { background: rgba(76,175,128,0.15); color: var(--green); }
+
+  .section-title {
+    max-width: 1000px;
+    margin: 40px auto 12px;
+    font-size: 14px;
+    color: var(--gold-dim);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .loading, .error-msg {
+    text-align: center;
+    color: var(--text-dim);
+    padding: 60px 20px;
+  }
+  .refresh-note {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 12px;
+    margin-top: 30px;
+  }
+</style>
+</head>
+<body>
+
+  <h1>SHRESTA 2026 — Registration Dashboard</h1>
+  <div class="subtitle" id="lastUpdated">Loading data…</div>
+
+  <div id="content" style="display:none;">
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-number" id="totalCards">–</div>
+        <div class="stat-label">Total Cards</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-number" id="submittedCount">–</div>
+        <div class="stat-label">Forms Submitted</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-number" id="pendingCount">–</div>
+        <div class="stat-label">Not Yet Registered</div>
+      </div>
+      <div class="stat-card" style="border-color:rgba(76,175,128,0.4);">
+        <div class="stat-number" id="completeCount">–</div>
+        <div class="stat-label">Profiles Complete</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-number" id="incompleteCount">–</div>
+        <div class="stat-label">Incomplete Profiles</div>
+      </div>
+    </div>
+
+    <div class="bar-wrap">
+      <div class="bar-row">
+        <div class="bar-label"><span>Form Submission Progress</span><span id="submitPct">0%</span></div>
+        <div class="bar-track"><div class="bar-fill" id="submitBar" style="background:var(--green); width:0%;"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label"><span>Profile Completion (of submitted)</span><span id="completePct">0%</span></div>
+        <div class="bar-track"><div class="bar-fill" id="completeBar" style="background:var(--gold); width:0%;"></div></div>
+      </div>
+    </div>
+
+    <div class="section-title">Incomplete Profiles (missing photo, phone, or email)</div>
+    <table>
+      <thead>
+        <tr><th>Card No.</th><th>Name</th><th>Missing</th></tr>
+      </thead>
+      <tbody id="incompleteTableBody"></tbody>
+    </table>
+
+    <div class="refresh-note">Refresh this page to pull the latest data. Sheet updates may take a minute to appear here.</div>
+  </div>
+
+  <div class="loading" id="loadingMsg">Loading registration data…</div>
+
+<script>
+  // ⚠️ Same published CSV link used by your card page
+  const CSV_URL = "PASTE_YOUR_PUBLISHED_CSV_URL_HERE";
+
+  // Total number of physical cards printed
+  const TOTAL_CARDS = 700;
+
+  const COLS = {
+    srNo: "Card Number",
+    name: "Full Name",
+    phone: "Mobile No.",
+    email: "Mail ID",
+    photoFileId: "PhotoFileId"
+  };
+
+  function isFilled(v) {
+    return v !== undefined && v !== null && String(v).trim() !== "";
+  }
+
+  fetch(CSV_URL)
+    .then(res => res.text())
+    .then(csvText => {
+      const parsed = Papa.parse(https://docs.google.com/spreadsheets/d/e/2PACX-1vS3R_tiihiz-wlHR17p-2Jz9fzME5eb61P-Gh_jbPQA5-1ZJ0ZM2z8yao7hl286xXkwQP46__8Dlg8w/pub?gid=1469908399&single=true&output=csv, { header: true, skipEmptyLines: true });
+      const rows = parsed.data;
+
+      // Keep only the latest submission per Card Number
+      const latestByCard = {};
+      rows.forEach(r => {
+        const srNo = String(r[COLS.srNo] || "").trim();
+        if (!srNo) return;
+        const t = Date.parse(r["Timestamp"]);
+        if (!latestByCard[srNo] || (!isNaN(t) && t > latestByCard[srNo]._t)) {
+          latestByCard[srNo] = Object.assign({}, r, { _t: isNaN(t) ? 0 : t });
+        }
+      });
+
+      const submitted = Object.values(latestByCard);
+      const submittedCount = submitted.length;
+      const pendingCount = Math.max(0, TOTAL_CARDS - submittedCount);
+
+      const incomplete = [];
+      let completeCount = 0;
+
+      submitted.forEach(r => {
+        const missing = [];
+        if (!isFilled(r[COLS.name])) missing.push("Name");
+        if (!isFilled(r[COLS.phone])) missing.push("Phone");
+        if (!isFilled(r[COLS.email])) missing.push("Email");
+        if (!isFilled(r[COLS.photoFileId])) missing.push("Photo");
+
+        if (missing.length === 0) {
+          completeCount++;
+        } else {
+          incomplete.push({ srNo: r[COLS.srNo], name: r[COLS.name] || "(no name)", missing });
+        }
+      });
+
+      const incompleteCount = incomplete.length;
+
+      document.getElementById('totalCards').textContent = TOTAL_CARDS;
+      document.getElementById('submittedCount').textContent = submittedCount;
+      document.getElementById('pendingCount').textContent = pendingCount;
+      document.getElementById('completeCount').textContent = completeCount;
+      document.getElementById('incompleteCount').textContent = incompleteCount;
+
+      const submitPct = TOTAL_CARDS > 0 ? Math.round((submittedCount / TOTAL_CARDS) * 100) : 0;
+      const completePct = submittedCount > 0 ? Math.round((completeCount / submittedCount) * 100) : 0;
+
+      document.getElementById('submitPct').textContent = submitPct + "%";
+      document.getElementById('submitBar').style.width = submitPct + "%";
+      document.getElementById('completePct').textContent = completePct + "%";
+      document.getElementById('completeBar').style.width = completePct + "%";
+
+      const tbody = document.getElementById('incompleteTableBody');
+      if (incomplete.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-dim);">All submitted profiles are complete 🎉</td></tr>';
+      } else {
+        incomplete.sort((a, b) => String(a.srNo).localeCompare(String(b.srNo)));
+        tbody.innerHTML = incomplete.map(item =>
+          '<tr><td>' + item.srNo + '</td><td>' + item.name + '</td><td>' +
+          item.missing.map(m => '<span class="tag missing">' + m + '</span>').join(' ') +
+          '</td></tr>'
+        ).join('');
+      }
+
+      document.getElementById('lastUpdated').textContent =
+        'Last loaded: ' + new Date().toLocaleString();
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    })
+    .catch(err => {
+      document.getElementById('loadingMsg').innerHTML =
+        '<div class="error-msg">Couldn\'t load data. Check CSV_URL is set correctly, and your internet connection.</div>';
+      console.error(err);
+    });
+</script>
+</body>
+</html>
