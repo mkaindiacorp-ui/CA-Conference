@@ -1183,8 +1183,11 @@
     }
     function normalizeInstagram(v) {
       if (!v) return "";
+      v = String(v).trim();
+      if (!v) return "";
       if (/^https?:\/\//i.test(v)) return v;
-      return "https://instagram.com/" + String(v).trim().replace(/^@/, "");
+      if (/instagram\.com/i.test(v)) return "https://" + v.replace(/^\/+/, "");
+      return "https://instagram.com/" + v.replace(/^@/, "");
     }
     function getInitials(name) {
       const parts = String(name).trim().split(/\s+/).filter(Boolean);
